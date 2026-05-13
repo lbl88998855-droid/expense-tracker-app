@@ -10,41 +10,45 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-    
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-    
-    - name: Accept Android SDK licenses
+
+    - name: Setup Android SDK licenses (use pre-installed SDK)
       run: |
-        mkdir -p $ANDROID_HOME/licenses
-        echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63b6825ea9cd9b6298b7b87d\n" > $ANDROID_HOME/licenses/android-sdk-license
-        echo -e "\nd975f751698a77b0b70291c983cd46a9b\n" > $ANDROID_HOME/licenses/intel-android-extra-license
-    
-    - name: Remove broken wrapper
-      run: rm -f gradle/wrapper/gradle-wrapper.jar
-    
-    - name: Generate Gradle Wrapper
-      run: |
-        curl -sL https://services.gradle.org/distributions/gradle-8.2-bin.zip -o gradle.zip
-        unzip -q gradle.zip
-        ./gradle-8.2/bin/gradle wrapper --gradle-version=8.2
-        rm -rf gradle.zip gradle-8.2
-    
+        mkdir -p /usr/local/lib/android/sdk/licenses
+        printf "\n24333f8a63b6825ea9cd9b6298b7b87d\n" > /usr/local/lib/android/sdk/licenses/android-sdk-license
+        printf "\nd56f5187479451eabf01fb78af6dfcb131a6481e\n" >> /usr/local/lib/android/sdk/licenses/android-sdk-license
+        printf "\nd975f751698a77b0b70291c983cd46a9b\n" > /usr/local/lib/android/sdk/licenses/intel-android-extra-license
+        printf "\n84831b9409646a918e30573bab4c9c91346d8abd\n" > /usr/local/lib/android/sdk/licenses/android-googletv-license
+        printf "\ne1ed94a3c2b167f6d8f860187d0dd5dd8d2c6bd\n" > /usr/local/lib/android/sdk/licenses/android-googlexr-license
+        printf "\n7b2837050b279717c16b282b829a31b72e5ab2d\n" > /usr/local/lib/android/sdk/licenses/android-sdk-arm-dbt-license
+        printf "\n84831b9409646a918e30573bab4c9c91346d8abd\n" > /usr/local/lib/android/sdk/licenses/android-sdk-preview-license
+        echo "All SDK licenses pre-accepted"
+        ls /usr/local/lib/android/sdk/licenses/
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    
+
     - name: Build Debug APK
       run: ./gradlew assembleDebug --no-daemon
-    
+
     - name: Upload APK as artifact
       uses: actions/upload-artifact@v4
       with:
