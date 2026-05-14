@@ -31,7 +31,6 @@ jobs:
         printf "\n7b2837050b279717c16b282b829a31b72e5ab2d\n" > /usr/local/lib/android/sdk/licenses/android-sdk-arm-dbt-license
         printf "\n84831b9409646a918e30573bab4c9c91346d8abd\n" > /usr/local/lib/android/sdk/licenses/android-sdk-preview-license
         echo "All SDK licenses pre-accepted"
-        ls /usr/local/lib/android/sdk/licenses/
 
     - name: Cache Gradle packages
       uses: actions/cache@v4
@@ -63,6 +62,8 @@ jobs:
       env:
         ANDROID_HOME: /usr/local/lib/android/sdk
         ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        JAVA_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=1g"
+        GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g"
       run: ./gradlew assembleDebug --no-daemon
 
     - name: Upload APK as artifact
