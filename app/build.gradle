@@ -65,6 +65,5 @@ dependencies {
     implementation "androidx.room:room-ktx:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
 
-    // Charts (Echarts for Android)
-    implementation 'com.github.AAChartModel:AAChartEngine-Kotlin:-SNAPSHOT'
+
 }
