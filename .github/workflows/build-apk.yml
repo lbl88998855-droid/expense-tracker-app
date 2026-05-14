@@ -43,10 +43,26 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
+    - name: Regenerate Gradle Wrapper JAR
+      run: |
+        echo "Downloading Gradle 8.2..."
+        curl -sL https://services.gradle.org/distributions/gradle-8.2-bin.zip -o gradle.zip
+        unzip -q gradle.zip
+        rm gradle.zip
+        echo "Regenerating gradle wrapper..."
+        ./gradle-8.2/bin/gradle wrapper --gradle-version 8.2 --no-daemon
+        echo "Cleaning up..."
+        rm -rf gradle-8.2
+        echo "Verifying wrapper JAR exists:"
+        ls -la gradle/wrapper/
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
     - name: Build Debug APK
+      env:
+        ANDROID_HOME: /usr/local/lib/android/sdk
+        ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       run: ./gradlew assembleDebug --no-daemon
 
     - name: Upload APK as artifact
