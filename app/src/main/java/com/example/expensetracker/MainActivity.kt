@@ -16,6 +16,7 @@ import com.example.expensetracker.ui.screens.ChatInputScreen
 import com.example.expensetracker.ui.screens.StatsScreen
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.example.expensetracker.viewmodel.ExpenseViewModel
+import com.example.expensetracker.viewmodel.StatsViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +38,8 @@ class MainActivity : ComponentActivity() {
 fun ExpenseTrackerApp() {
     val navController = rememberNavController()
     val expenseViewModel: ExpenseViewModel = viewModel()
-    
+    val statsViewModel: StatsViewModel = viewModel()
+
     NavHost(
         navController = navController,
         startDestination = "chat"
@@ -50,6 +52,7 @@ fun ExpenseTrackerApp() {
         }
         composable("stats") {
             StatsScreen(
+                viewModel = statsViewModel,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
